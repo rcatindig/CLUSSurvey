@@ -17,8 +17,8 @@ $(document).ready(function() {
          data: params, // serializes the form's elements.
          success: function(data)
          {
-            //alert(data);
-            window.location = "questions/part_1";
+            alert(data);
+            window.location = baseurl + "questions/part_1";
             // window.location.href = baseurl + "questions/part_1"
          }
        });

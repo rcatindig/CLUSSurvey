@@ -21,6 +21,8 @@ class Questions extends ADMIN_Controller {
 
 		);
 
+
+
 		// GET ALL COUNTIES
 		$data["counties"] = $this->cm->get_counties();
 
@@ -29,6 +31,8 @@ class Questions extends ADMIN_Controller {
 
 	public function continue()
 	{
+		
+		
 		$success = 0;
 		$first_name = $this->input->post('first_name');
 		$last_name = $this->input->post('last_name');
@@ -51,11 +55,11 @@ class Questions extends ADMIN_Controller {
 
 		$this->session->set_userdata($newdata);
 
-		var_export($newdata);
+		//var_export($newdata);
 
 		$success = 1;
 
-		// echo $success;
+		echo $success;
        	
 	}
 
@@ -64,6 +68,9 @@ class Questions extends ADMIN_Controller {
 
 		$county_name = $this->session->userdata('county');
 		$county_id = $this->session->userdata('county_id');
+
+		$sessions = $this->session->all_userdata();
+		var_export($sessions);
 
 		
 
@@ -212,12 +219,17 @@ class Questions extends ADMIN_Controller {
 		
 		// GET ALL MUNICIPALITIES WITH HISTORIC PRESERVATIONS
 		$param_hist["response_id"] = $id;
+		$data["response_id"] = $id;
 
 		$municipalities = $this->qm->get_municipalities_by_response($param_hist);
 		$data["municipalities"] = $municipalities;
 		$data["total"] = count($municipalities);
 
+		$data['load_js'] = array(
 
+			"part_2"
+
+		);
 
 
 		$quest_opt_arr = array();
@@ -271,6 +283,71 @@ class Questions extends ADMIN_Controller {
 		$data["counties"] = $this->cm->get_counties();
 
 		$this->template->load($data, 'template', 'part_2');
+	}
+
+	public function submit_survey()
+	{
+		try {
+
+			$status = 0;
+			$response_id = $this->input->post('response_id');
+			$params["response_id"] = $response_id;
+
+			$municipalities = $this->qm->get_municipalities_by_response($params);
+
+			// GET ALL QUESTIONS FIRST
+			$questions = $this->qm->get_questions();
+
+			$save_params = array();
+
+			foreach($municipalities as $mun){
+
+				$mun_id = $mun->id;
+
+				foreach($questions as $quest){
+
+					$quest_id = $quest->id;
+
+					$field = "question_" . $mun_id . "_" . $quest_id;
+					$field_val = $this->input->post($field);
+
+					for($i=0; $i < count($field_val); $i++ ){
+
+						$option = $field_val[$i];
+						
+
+						$save_params[] = array(
+							'response_id' => $response_id,
+							'municipality_id' => $mun_id,
+							'question_id' => $quest_id,
+							'option_id' => $option
+						);
+
+					}
+
+				}
+
+			}
+
+			if(!EMPTY($save_params))
+			{
+				$this->qm->insert_part_two($save_params);
+			}
+
+			$msg = "Save Successfully!";
+
+			$status = 1;			
+			
+		} catch (Exception $e) {
+			$msg = $e->getMessage();
+			$status = 0;
+			
+		}
+
+		$data["status"] = $status;
+		$data["msg"] = $msg;
+
+		echo json_encode($data);
 	}
 
 	

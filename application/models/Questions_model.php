@@ -102,11 +102,7 @@ class Questions_model extends CI_Model {
 	{
 		try
 		{
-			/*
-				SELECT * FROM response_part_one AS r
-				LEFT JOIN municipality AS m
-				ON r.municipality_id = m.id
-				*/
+			
 			$this->db->select('m.id,m.municipality_name')
 					->from('response_part_one as r')
 					->join('municipality as m', 'r.municipality_id = m.id')
@@ -120,6 +116,19 @@ class Questions_model extends CI_Model {
 		catch(Exception $e){
 			throw $e;
 		}
+	}
+
+	public function insert_part_two($arr)
+	{
+		try
+		{
+			$this->db->insert_batch('response_part_two',$arr); 
+		}
+		catch(Exception $e)
+		{
+			throw $e;
+		}
+
 	}
 
 

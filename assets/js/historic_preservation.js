@@ -50,7 +50,6 @@ function confirm_part_two(his_mun){
           }
       },
       callback: function (result) {
-          console.log('This was logged in the callback: ' + result);
 
           if (result === true)
           {
